@@ -89,6 +89,14 @@ class ApprenticeCreate(BaseModel):
     job_role: str
     skills: str
 
+class ApprenticeUpdate(BaseModel):
+    name: str
+    email: str
+    age: int
+    cohort_year: int
+    job_role: str
+    skills: str
+
 class ApprenticeResponse(BaseModel):
     id: int
     name: str
@@ -244,6 +252,66 @@ async def get_apprentice(apprentice_id: int, db: Session = Depends(get_db), user
         skills=apprentice.skills,
         creator_username=creator_username  
     )
+
+@app.put('/apprentices/{apprentice_id}', response_model=ApprenticeResponse)
+async def update_apprentice(apprentice_id: int, apprentice_data: ApprenticeUpdate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    db_apprentice = db.query(Apprentice).filter(Apprentice.id == apprentice_id).first()
+
+    if not db_apprentice:
+        raise HTTPException(status_code=404, detail="Apprentice not found")
+
+    if db_apprentice.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to edit this apprentice")
+
+
+    db_apprentice.name = apprentice_data.name
+    db_apprentice.email = apprentice_data.email
+    db_apprentice.age = apprentice_data.age
+    db_apprentice.cohort_year = apprentice_data.cohort_year
+    db_apprentice.job_role = apprentice_data.job_role
+    db_apprentice.skills = apprentice_data.skills
+
+    db.commit()
+    db.refresh(db_apprentice)
+
+    return ApprenticeResponse(
+        id=db_apprentice.id,
+        name=db_apprentice.name,
+        email=db_apprentice.email,
+        age=db_apprentice.age,
+        cohort_year=db_apprentice.cohort_year,
+        job_role=db_apprentice.job_role,
+        skills=db_apprentice.skills,
+        creator_username=current_user.username  
+    )
+
+@app.delete('/apprentices/{apprentice_id}', response_model=ApprenticeResponse)
+async def delete_apprentice(apprentice_id: int, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
+    is_admin(user) 
+    db_apprentice = db.query(Apprentice).filter(Apprentice.id == apprentice_id).first()
+    if not db_apprentice:
+        raise HTTPException(status_code=404, detail="Apprentice not found")
+    
+
+    creator = db.query(User).filter(User.id == db_apprentice.creator_id).first()
+
+
+    response = ApprenticeResponse(
+        id=db_apprentice.id,
+        name=db_apprentice.name,
+        email=db_apprentice.email,
+        age=db_apprentice.age,
+        cohort_year=db_apprentice.cohort_year,
+        job_role=db_apprentice.job_role,
+        skills=db_apprentice.skills,
+        creator_username=creator.username  
+    )
+
+    db.delete(db_apprentice)
+    db.commit()
+
+    return response
+
 
 @app.get('/logout')
 async def logout(response: RedirectResponse):
