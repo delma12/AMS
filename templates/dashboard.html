@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            height: 40vh;
+            width: 80%;
+            margin: auto;
+            margin-top: 5%;
+        }
+
+        .dashboard-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.5rem;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .dashboard-box:hover {
+            background-color: #f8f9fa;
+        }
+
+        .logout-box {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .dashboard-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-title">
+            {{ title }}
+        </div>
+        <div class="dashboard-container">
+            <div class="dashboard-box" onclick="window.location.href='/apprentices'">
+                <span>Apprentices</span>
+            </div>
+            {% if is_admin %}
+            <div class="dashboard-box" onclick="window.location.href='/users'">
+                <span>Users</span>
+            </div>
+            {% endif %}
+            <div class="dashboard-box logout-box" onclick="window.location.href='/logout'">
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

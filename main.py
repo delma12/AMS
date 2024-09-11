@@ -9,26 +9,25 @@ from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
 
 
-# Initialize FastAPI app and Jinja templates
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# Initialize database on startup
+
 init_db()
 
-# Password hashing configuration
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Middleware for CORS
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this to specific origins
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
+    allow_methods=["*"],  
     allow_headers=["*"],
 )
 
-# Dependency to get DB session
+
 def get_db():
     db = SessionLocal()
     try:
@@ -36,7 +35,7 @@ def get_db():
     finally:
         db.close()
 
-# Helper: Create admin user if it doesn't exist
+
 def create_admin_user(db: Session):
     if not db.query(User).filter(User.username == "admin").first():
         hashed_password = pwd_context.hash("adminpassword")
@@ -44,7 +43,6 @@ def create_admin_user(db: Session):
         db.add(admin_user)
         db.commit()
 
-# Startup event to create admin user
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
@@ -53,7 +51,6 @@ async def startup_event():
     finally:
         db.close()
 
-# Helper: Get current user from cookie
 def get_current_user(username: str = Cookie(None), db: Session = Depends(get_db)):
     if not username:
         raise HTTPException(status_code=403, detail="User not authenticated")
@@ -62,7 +59,6 @@ def get_current_user(username: str = Cookie(None), db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-# Helper: Check if the current user is admin
 def is_admin(user: User):
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Unauthorised")
@@ -107,3 +103,12 @@ async def register_post(request: Request, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     return templates.TemplateResponse("index.html", {"request": request, "message": "Registration successful! You can now log in."})
+
+@app.get('/dashboard')
+async def dashboard(request: Request, user: UserResponse = Depends(get_current_user)):
+    title = f"Welcome, {'Admin' if user.is_admin else user.username}'s Dashboard"
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request, 
+        "title": title, 
+        "is_admin": user.is_admin  
+    })
