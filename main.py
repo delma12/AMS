@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import SessionLocal, init_db
-from models import User
+from models import User, Apprentice
 from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
@@ -100,7 +100,7 @@ class ApprenticeResponse(BaseModel):
     creator_username: str
     class Config:
         orm_mode = True
-        
+
 @app.get('/')
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -187,6 +187,63 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), current_user:
     db.delete(db_user)
     db.commit()
     return db_user
+
+@app.get('/apprentices')
+async def apprentices(request: Request, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
+    apprentices = db.query(Apprentice).all()
+    return templates.TemplateResponse("apprentice.html", {
+        "request": request,
+        "apprentices": apprentices,
+        "is_admin": user.is_admin,
+        "current_user": user  
+    })
+
+@app.post('/apprentices', response_model=ApprenticeResponse)
+async def create_apprentice(apprentice_data: ApprenticeCreate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    new_apprentice = Apprentice(
+        name=apprentice_data.name,
+        email=apprentice_data.email,
+        age=apprentice_data.age,
+        cohort_year=apprentice_data.cohort_year,
+        job_role=apprentice_data.job_role,
+        skills=apprentice_data.skills,
+        creator_id=current_user.id
+    )
+    db.add(new_apprentice)
+    db.commit()
+    db.refresh(new_apprentice)
+
+    creator_username = db.query(User.username).filter(User.id == current_user.id).scalar()  
+
+    return ApprenticeResponse(
+        id=new_apprentice.id,
+        name=new_apprentice.name,
+        email=new_apprentice.email,
+        age=new_apprentice.age,
+        cohort_year=new_apprentice.cohort_year,
+        job_role=new_apprentice.job_role,
+        skills=new_apprentice.skills,
+        creator_username=creator_username  
+    )
+
+@app.get('/apprentices/{apprentice_id}', response_model=ApprenticeResponse) #getting a specific apprentice via apprenticeId
+async def get_apprentice(apprentice_id: int, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
+    apprentice = db.query(Apprentice).filter(Apprentice.id == apprentice_id).first()
+    if not apprentice:
+        raise HTTPException(status_code=404, detail="Apprentice not found")
+
+    creator_username = db.query(User.username).filter(User.id == apprentice.creator_id).scalar()
+
+    return ApprenticeResponse(
+        id=apprentice.id,
+        name=apprentice.name,
+        email=apprentice.email,
+        age=apprentice.age,
+        cohort_year=apprentice.cohort_year,
+        job_role=apprentice.job_role,
+        skills=apprentice.skills,
+        creator_username=creator_username  
+    )
 
 @app.get('/logout')
 async def logout(response: RedirectResponse):
