@@ -69,6 +69,11 @@ class UserCreate(BaseModel):
     password: str
     is_admin: bool = False 
 
+class UserUpdate(BaseModel):
+    username: str
+    password: str = None  
+    is_admin: bool = False
+
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -129,6 +134,30 @@ async def create_user(user_data: UserCreate, db: Session = Depends(get_db), curr
     db.commit()
     db.refresh(new_user)
     return new_user
+
+@app.put('/users/{user_id}', response_model=UserResponse)
+async def update_user(user_id: int, user_data: UserUpdate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    is_admin(current_user)  # Check if current user is admin
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_user.username = user_data.username
+    if user_data.password:
+        db_user.hashed_password = pwd_context.hash(user_data.password)
+    db_user.is_admin = user_data.is_admin
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@app.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    
+    if user:
+        return user  
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
 
 @app.get('/logout')
 async def logout(response: RedirectResponse):
