@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+        }
+        .form-container .form-toggle {
+            cursor: pointer;
+        }
+        .form-check-item {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div id="login-form" class="form-group">
+            <h2>Login</h2>
+            <form method="post" action="/login">
+                <div class="mb-3">
+                    <label for="login-username" class="form-label">Username</label>
+                    <input type="text" id="login-username" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" id="login-password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p class="form-toggle" onclick="toggleForm()">Don't have an account? Register</p>
+            </form>
+        </div>
+
+        <div id="register-form" class="form-group" style="display: none;">
+            <h2>Register</h2>
+            <form method="post" action="/register" id="registrationForm">
+                <div class="mb-3">
+                    <label for="register-username" class="form-label">Username</label>
+                    <input type="text" id="register-username" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-password" class="form-label">Password</label>
+                    <input type="password" id="register-password" name="password" class="form-control" required>
+                    <div id="passwordRequirements" class="form-text">
+                        <ul>
+                            <li id="length" class="form-check-item">8 characters minimum</li>
+                            <li id="uppercase" class="form-check-item">At least one uppercase letter</li>
+                            <li id="lowercase" class="form-check-item">At least one lowercase letter</li>
+                            <li id="number" class="form-check-item">At least one number</li>
+                            <li id="special" class="form-check-item">At least one special character</li>
+                        </ul>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="register-button" disabled>Register</button>
+                <p class="form-toggle" onclick="toggleForm()">Already have an account? Login</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle forms
+            window.toggleForm = function() {
+                const loginForm = document.getElementById('login-form');
+                const registerForm = document.getElementById('register-form');
+                if (loginForm.style.display === 'none') {
+                    loginForm.style.display = 'block';
+                    registerForm.style.display = 'none';
+                } else {
+                    loginForm.style.display = 'none';
+                    registerForm.style.display = 'block';
+                }
+            };
+
+            // Password validation
+            const passwordInput = document.getElementById('register-password');
+            const requirements = {
+                length: document.getElementById('length'),
+                uppercase: document.getElementById('uppercase'),
+                lowercase: document.getElementById('lowercase'),
+                number: document.getElementById('number'),
+                special: document.getElementById('special')
+            };
+            const registerButton = document.getElementById('register-button');
+
+            passwordInput.addEventListener('input', function() {
+                const value = passwordInput.value;
+                const lengthValid = value.length >= 8;
+                const uppercaseValid = /[A-Z]/.test(value);
+                const lowercaseValid = /[a-z]/.test(value);
+                const numberValid = /[0-9]/.test(value);
+                const specialValid = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+                requirements.length.style.color = lengthValid ? 'green' : 'red';
+                requirements.uppercase.style.color = uppercaseValid ? 'green' : 'red';
+                requirements.lowercase.style.color = lowercaseValid ? 'green' : 'red';
+                requirements.number.style.color = numberValid ? 'green' : 'red';
+                requirements.special.style.color = specialValid ? 'green' : 'red';
+
+                const allValid = lengthValid && uppercaseValid && lowercaseValid && numberValid && specialValid;
+                registerButton.disabled = !allValid;
+            });
+        });
+    </script>
+</body>
+</html>
