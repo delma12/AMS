@@ -158,6 +158,15 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=404, detail="User not found")
 
+@app.delete('/users/{user_id}', response_model=UserResponse)
+async def delete_user(user_id: int, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    is_admin(current_user)  # Check if current user is admin
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(db_user)
+    db.commit()
+    return db_user
 
 @app.get('/logout')
 async def logout(response: RedirectResponse):
