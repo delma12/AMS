@@ -45,7 +45,7 @@
                     <tr>
                         <td>{{ user.id }}</td>
                         <td>{{ user.username }}</td>
-                        <td>***</td> <!-- Display hashed password as stars -->
+                        <td>***</td> 
                         <td>{{ 'Admin' if user.is_admin else 'User' }}</td>
                         <td>
                             <button class="btn btn-warning" onclick="editUser({{ user.id }})">Edit</button>
@@ -57,7 +57,7 @@
             </table>
         </div>
 
-        <!-- Centered Back to Dashboard Button -->
+        
         <div class="text-center mt-4">
             <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
         </div>
@@ -112,10 +112,10 @@
         }
 
         document.getElementById('user-form').addEventListener('submit', async function(event) {
-            event.preventDefault();  // Prevent default form submission
+            event.preventDefault();  
 
             if (!window.confirm('Are you sure you want to save these changes?')) {
-                return;  // Exit if user does not confirm
+                return;  
             }
 
             // Get form data
@@ -128,7 +128,7 @@
             try {
                 let response;
                 if (currentUserId) {
-                    // If editing, send a PUT request to update the user
+                    
                     response = await fetch(`/users/${currentUserId}`, {
                         method: 'PUT',
                         headers: {
@@ -137,7 +137,7 @@
                         body: JSON.stringify(userData),
                     });
                 } else {
-                    // If adding a new user, send a POST request
+                    
                     response = await fetch('/users', {
                         method: 'POST',
                         headers: {
@@ -149,7 +149,7 @@
 
                 if (response.ok) {
                     showNotification('User saved successfully', true);
-                    location.reload();  // Reload the page to show the updated user list
+                    location.reload();  
                 } else {
                     const errorData = await response.json();
                     showNotification(`Error saving user: ${errorData.detail}`, false);
@@ -164,7 +164,7 @@
 
         function editUser(userId) {
             fetch(`/users/${userId}`, {
-                method: 'GET',  // Ensure it's a GET request
+                method: 'GET',  
             })
             .then(response => {
                 if (!response.ok) {
@@ -174,7 +174,7 @@
             })
             .then(user => {
                 document.getElementById('username').value = user.username;
-                // Don't pre-fill the password field
+              
                 document.getElementById('role').value = user.is_admin ? 'admin' : 'user';
 
                 currentUserId = userId;
@@ -202,7 +202,7 @@
             .then(response => {
                 if (response.ok) {
                     showNotification('User deleted successfully', true);
-                    location.reload();  // Reload the page to reflect changes
+                    location.reload(); 
                 } else {
                     showNotification('Error deleting user', false);
                 }

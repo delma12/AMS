@@ -81,6 +81,26 @@ class UserResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class ApprenticeCreate(BaseModel):
+    name: str
+    email: str
+    age: int
+    cohort_year: int
+    job_role: str
+    skills: str
+
+class ApprenticeResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    age: int
+    cohort_year: int
+    job_role: str
+    skills: str
+    creator_username: str
+    class Config:
+        orm_mode = True
+        
 @app.get('/')
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -121,13 +141,13 @@ async def dashboard(request: Request, user: UserResponse = Depends(get_current_u
 
 @app.get('/users', response_model=List[UserResponse])
 async def get_users(request: Request, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
-    is_admin(user)  # Check if current user is admin
+    is_admin(user)  
     users = db.query(User).all()
     return templates.TemplateResponse("users.html", {"request": request, "users": users, "is_admin": user.is_admin})
 
 @app.post('/users', response_model=UserResponse)
 async def create_user(user_data: UserCreate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
-    is_admin(current_user)  # Check if current user is admin
+    is_admin(current_user)  
     hashed_password = pwd_context.hash(user_data.password)
     new_user = User(username=user_data.username, hashed_password=hashed_password, is_admin=user_data.is_admin)
     db.add(new_user)
@@ -137,7 +157,7 @@ async def create_user(user_data: UserCreate, db: Session = Depends(get_db), curr
 
 @app.put('/users/{user_id}', response_model=UserResponse)
 async def update_user(user_id: int, user_data: UserUpdate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
-    is_admin(current_user)  # Check if current user is admin
+    is_admin(current_user) 
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -160,7 +180,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.delete('/users/{user_id}', response_model=UserResponse)
 async def delete_user(user_id: int, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
-    is_admin(current_user)  # Check if current user is admin
+    is_admin(current_user) 
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
