@@ -112,3 +112,8 @@ async def dashboard(request: Request, user: UserResponse = Depends(get_current_u
         "title": title, 
         "is_admin": user.is_admin  
     })
+
+@app.get('/logout')
+async def logout(response: RedirectResponse):
+    response.delete_cookie(key="username")
+    return RedirectResponse(url='/')
