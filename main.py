@@ -7,6 +7,7 @@ from models import User
 from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
+from typing import List
 
 
 app = FastAPI()
@@ -112,6 +113,22 @@ async def dashboard(request: Request, user: UserResponse = Depends(get_current_u
         "title": title, 
         "is_admin": user.is_admin  
     })
+
+@app.get('/users', response_model=List[UserResponse])
+async def get_users(request: Request, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
+    is_admin(user)  # Check if current user is admin
+    users = db.query(User).all()
+    return templates.TemplateResponse("users.html", {"request": request, "users": users, "is_admin": user.is_admin})
+
+@app.post('/users', response_model=UserResponse)
+async def create_user(user_data: UserCreate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    is_admin(current_user)  # Check if current user is admin
+    hashed_password = pwd_context.hash(user_data.password)
+    new_user = User(username=user_data.username, hashed_password=hashed_password, is_admin=user_data.is_admin)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 @app.get('/logout')
 async def logout(response: RedirectResponse):
