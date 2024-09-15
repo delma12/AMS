@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends, HTTPException, Cookie
+from fastapi import FastAPI, Request, Depends, HTTPException, Cookie, Response
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -367,3 +367,7 @@ if __name__ == "__main__":
 
     port = int(os.getenv("PORT", 8000))  
     uvicorn.run("main:app", host="0.0.0.0", port=port)
+
+@app.head("/")
+async def head_index():
+    return Response(status_code=200)
