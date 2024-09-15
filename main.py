@@ -158,14 +158,12 @@ async def register_post(request: Request, db: Session = Depends(get_db)):
 
 @app.get('/dashboard')
 async def dashboard(request: Request, user: UserResponse = Depends(get_current_user)):
-    title = f"Welcome, {
-        'Admin' if user.is_admin else user.username}'s Dashboard"
+    title = f"Welcome, {'Admin' if user.is_admin else user.username}'s Dashboard"
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "title": title,
         "is_admin": user.is_admin
     })
-
 
 @app.get('/users', response_model=List[UserResponse])
 async def get_users(request: Request, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
