@@ -1,5 +1,3 @@
-import os
-import uvicorn
 from fastapi import FastAPI, Request, Depends, HTTPException, Cookie
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -362,6 +360,10 @@ async def logout(response: RedirectResponse):
     response.delete_cookie(key="username")
     return RedirectResponse(url='/')
 
+
 if __name__ == "__main__":
+    import uvicorn
     import os
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+
+    port = int(os.getenv("PORT", 8000))  
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
