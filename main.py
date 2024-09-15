@@ -1,3 +1,5 @@
+import os
+import uvicorn
 from fastapi import FastAPI, Request, Depends, HTTPException, Cookie
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -9,6 +11,7 @@ from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse
 from typing import List
 from fastapi.staticfiles import StaticFiles
+
 
 
 app = FastAPI()
@@ -358,3 +361,7 @@ async def delete_apprentice(apprentice_id: int, db: Session = Depends(get_db), u
 async def logout(response: RedirectResponse):
     response.delete_cookie(key="username")
     return RedirectResponse(url='/')
+
+if __name__ == "__main__":
+    import os
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
