@@ -262,16 +262,14 @@ async def create_apprentice(apprentice_data: ApprenticeCreate, db: Session = Dep
     )
 
 
-# getting a specific apprentice via apprenticeId
 @app.get('/apprentices/{apprentice_id}', response_model=ApprenticeResponse)
 async def get_apprentice(apprentice_id: int, db: Session = Depends(get_db), user: UserResponse = Depends(get_current_user)):
-    apprentice = db.query(Apprentice).filter(
-        Apprentice.id == apprentice_id).first()
+    apprentice = db.query(Apprentice).filter(Apprentice.id == apprentice_id).first()
     if not apprentice:
         raise HTTPException(status_code=404, detail="Apprentice not found")
 
-    creator_username = db.query(User.username).filter(
-        User.id == apprentice.creator_id).scalar()
+    
+    creator_username = db.query(User.username).filter(User.id == apprentice.creator_id).scalar() or "Deleted User"
 
     return ApprenticeResponse(
         id=apprentice.id,
@@ -285,17 +283,28 @@ async def get_apprentice(apprentice_id: int, db: Session = Depends(get_db), user
     )
 
 
+
 @app.put('/apprentices/{apprentice_id}', response_model=ApprenticeResponse)
-async def update_apprentice(apprentice_id: int, apprentice_data: ApprenticeUpdate, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
-    db_apprentice = db.query(Apprentice).filter(
-        Apprentice.id == apprentice_id).first()
+async def update_apprentice(
+    apprentice_id: int,
+    apprentice_data: ApprenticeUpdate,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    
+    db_apprentice = db.query(Apprentice).filter(Apprentice.id == apprentice_id).first()
 
     if not db_apprentice:
         raise HTTPException(status_code=404, detail="Apprentice not found")
 
-    if db_apprentice.creator_id != current_user.id:
-        raise HTTPException(
-            status_code=403, detail="Not authorized to edit this apprentice")
+    
+    if is_admin(current_user):
+        
+        pass
+    elif db_apprentice.creator_id != current_user.id:
+        
+        raise HTTPException(status_code=403, detail="Not authorised to edit this apprentice")
+
 
     db_apprentice.name = apprentice_data.name
     db_apprentice.email = apprentice_data.email
@@ -307,6 +316,9 @@ async def update_apprentice(apprentice_id: int, apprentice_data: ApprenticeUpdat
     db.commit()
     db.refresh(db_apprentice)
 
+    creator = db.query(User).filter(User.id == db_apprentice.creator_id).first()
+    creator_username = creator.username if creator else "Deleted User"
+
     return ApprenticeResponse(
         id=db_apprentice.id,
         name=db_apprentice.name,
@@ -315,8 +327,10 @@ async def update_apprentice(apprentice_id: int, apprentice_data: ApprenticeUpdat
         cohort_year=db_apprentice.cohort_year,
         job_role=db_apprentice.job_role,
         skills=db_apprentice.skills,
-        creator_username=current_user.username
+        creator_username=creator_username
     )
+
+
 
 
 @app.delete('/apprentices/{apprentice_id}', response_model=ApprenticeResponse)

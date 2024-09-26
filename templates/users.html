@@ -83,10 +83,10 @@
         <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
       </div>
 
-      <!-- Notification Banner -->
+      
       <div id="notificationBanner" class="notification-banner"></div>
 
-      <!-- Modal for adding/editing user -->
+      
       <div
         class="modal fade"
         id="addUserModal"
@@ -173,7 +173,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        // Password validation logic
+        
         const passwordInput = document.getElementById("password");
         const requirements = {
           length: document.getElementById("length"),
@@ -213,7 +213,7 @@
             return;
           }
 
-          // Get form data
+          
           const userData = {
             username: document.getElementById("username").value,
             password: document.getElementById("password").value,
@@ -271,7 +271,7 @@
               ? "admin"
               : "user";
 
-            // Set modal title to "Update User" for editing
+            
             document.getElementById("addUserModalLabel").innerText =
               "Update User";
 
@@ -288,7 +288,7 @@
           });
       }
 
-      // Reset modal for adding new user
+      
       document
         .querySelector("[data-bs-target='#addUserModal']")
         .addEventListener("click", function () {
@@ -297,10 +297,10 @@
           document.getElementById("password").value = "";
           document.getElementById("role").value = "user";
 
-          // Set modal title to "Add User"
+          
           document.getElementById("addUserModalLabel").innerText = "Add User";
 
-          currentUserId = null; // Reset user ID for new user
+          currentUserId = null; 
         });
 
       function confirmDeleteUser(userId) {

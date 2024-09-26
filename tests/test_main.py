@@ -7,26 +7,26 @@ from fastapi.testclient import TestClient
 from models import User
 from passlib.context import CryptContext
 
-# Create a new in-memory SQLite database for tests
+
 SQLALCHEMY_DATABASE_URL = "sqlite:///./tests.db"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Override the get_db dependency to use the test database
+
 @pytest.fixture(scope="function")
 def test_db():
-    # Create the database schema (tables)
+
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
-    # Drop the schema after the test
+
     Base.metadata.drop_all(bind=engine)
 
-# Utility to create an admin user for tests
+
 def create_test_admin_user(db):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash("adminpassword")
@@ -34,7 +34,7 @@ def create_test_admin_user(db):
     db.add(admin_user)
     db.commit()
 
-# Utility to create a normal user for tests
+
 def create_test_user(db, username="testuser", password="testpassword"):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(password)
@@ -42,7 +42,7 @@ def create_test_user(db, username="testuser", password="testpassword"):
     db.add(user)
     db.commit()
 
-# Override FastAPI dependency
+
 @pytest.fixture(scope="function")
 def client(test_db):
     def override_get_db():
@@ -57,7 +57,7 @@ def client(test_db):
 
 @pytest.fixture(scope="function")
 def client_with_admin(test_db):
-    # Create admin user for tests
+    
     create_test_admin_user(test_db)
 
     def override_get_db():
@@ -70,7 +70,7 @@ def client_with_admin(test_db):
     client = TestClient(app)
     return client
 
-# Test cases
+
 def test_register_user(client):
     response = client.post("/register", data={"username": "testuser", "password": "testpassword"})
     assert response.status_code == 200
@@ -89,7 +89,7 @@ def test_login(client, test_db):
     assert response.status_code == 302
     assert response.headers["location"] == "/dashboard"
 
-  # Test invalid login
+  
     response = client.post("/login", data={"username": "wronguser", "password": "wrongpassword"})
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid credentials"

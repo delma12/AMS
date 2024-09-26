@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Apprentices</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-      .notification-banner {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        padding: 10px;
-        text-align: center;
-        z-index: 1050;
-      }
-      .notification-banner.success {
-        background-color: #d4edda;
-        color: #155724;
-      }
-      .notification-banner.error {
-        background-color: #f8d7da;
-        color: #721c24;
-      }
+        .notification-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            z-index: 1050;
+        }
+        .notification-banner.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .notification-banner.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
-  </head>
-  <body>
-    <div class="notification-banner" id="notificationBanner"></div>
+</head>
+<body>
+<div class="notification-banner" id="notificationBanner"></div>
 
-    <div class="container mt-5">
-      <h1 class="text-center">Apprentices</h1>
-      <table class="table">
+<div class="container mt-5">
+    <h1 class="text-center">Apprentices</h1>
+    <table class="table">
         <thead>
-          <tr>
+        <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
@@ -47,11 +47,11 @@
             <th>Skills</th>
             <th>Created By</th>
             <th>Actions</th>
-          </tr>
+        </tr>
         </thead>
         <tbody id="apprentice-table-body">
-          {% for apprentice in apprentices %}
-          <tr>
+        {% for apprentice in apprentices %}
+        <tr>
             <td>{{ apprentice.id }}</td>
             <td>{{ apprentice.name }}</td>
             <td>{{ apprentice.email }}</td>
@@ -62,252 +62,348 @@
             <td>{{ apprentice.creator.username }}</td>
 
             <td>
-              {% if current_user.id == apprentice.creator_id or is_admin %}
-
-              <button
-                class="btn btn-warning"
-                onclick="editApprentice({{ apprentice.id }})"
-              >
-                Edit
-              </button>
-              {% endif %} {% if is_admin %}
-              <button
-                class="btn btn-danger"
-                onclick="confirmDelete({{ apprentice.id }})"
-              >
-                Delete
-              </button>
-              {% endif %}
+                {% if current_user.id == apprentice.creator_id or is_admin %}
+                <button
+                    class="btn btn-warning"
+                    onclick="editApprentice({{ apprentice.id }})"
+                >
+                    Edit
+                </button>
+                {% endif %} {% if is_admin %}
+                <button
+                    class="btn btn-danger"
+                    onclick="confirmDelete({{ apprentice.id }})"
+                >
+                    Delete
+                </button>
+                {% endif %}
             </td>
-          </tr>
-          {% endfor %}
+        </tr>
+        {% endfor %}
         </tbody>
-      </table>
+    </table>
 
-      <button
+    <button
         class="btn btn-primary"
         data-bs-toggle="modal"
         data-bs-target="#addApprenticeModal"
-      >
-        Add Apprentice
-      </button>
-      <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
-    </div>
-
-    <div
-      class="modal fade"
-      id="addApprenticeModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
     >
-      <div class="modal-dialog">
+        Add Apprentice
+    </button>
+    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div
+    class="modal fade"
+    id="addApprenticeModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add Apprentice</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form id="apprentice-form">
-              <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" required />
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" required />
-              </div>
-              <div class="mb-3">
-                <label for="age" class="form-label">Age</label>
-                <input type="number" class="form-control" id="age" required />
-              </div>
-              <div class="mb-3">
-                <label for="cohort_year" class="form-label">Cohort Year</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cohort_year"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="job_role" class="form-label">Job Role </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="job_role"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="skills" class="form-label">Skills</label>
-                <input type="text" class="form-control" id="skills" required />
-              </div>
-              <button type="submit" class="btn btn-primary">Save</button>
-            </form>
-          </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Apprentice</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <form id="apprentice-form">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="name"
+                            required
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            required
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="age" class="form-label">Age</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="age"
+                            required
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="cohort_year" class="form-label">Cohort Year</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="cohort_year"
+                            required
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="job_role" class="form-label">Job Role </label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="job_role"
+                            required
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="skills" class="form-label">Skills</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="skills"
+                            required
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                        />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <script>
-      let currentApprenticeId = null;
+<script>
+    let currentApprenticeId = null;
 
-      function showNotification(message, isSuccess) {
+    function showNotification(message, isSuccess) {
         const banner = document.getElementById("notificationBanner");
         banner.textContent = message;
-        banner.className = `notification-banner ${
-          isSuccess ? "success" : "error"
-        }`;
+        banner.className = `notification-banner ${isSuccess ? "success" : "error"}`;
         banner.style.display = "block";
         setTimeout(() => {
-          banner.style.display = "none";
+            banner.style.display = "none";
         }, 5000);
-      }
+    }
 
-      document
+ 
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    document
         .getElementById("apprentice-form")
         .addEventListener("submit", async function (event) {
-          event.preventDefault();
+            event.preventDefault();
 
-          if (!window.confirm("Are you sure you want to save these changes?")) {
-            return;
-          }
+            
+            tooltipList.forEach((tooltip) => tooltip.hide());
 
-          // Get form data
-          const apprenticeData = {
-            name: document.getElementById("name").value,
-            email: document.getElementById("email").value,
-            age: document.getElementById("age").value,
-            cohort_year: document.getElementById("cohort_year").value,
-            job_role: document.getElementById("job_role").value,
-            skills: document.getElementById("skills").value,
-          };
-
-          try {
-            let response;
-            if (currentApprenticeId) {
-              response = await fetch(`/apprentices/${currentApprenticeId}`, {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(apprenticeData),
-              });
-            } else {
-              response = await fetch("/apprentices", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(apprenticeData),
-              });
+          
+            if (!validateForm()) {
+                return;
             }
 
-            if (response.ok) {
-              showNotification("Apprentice saved successfully", true);
-              location.reload();
-            } else {
-              const errorData = await response.json();
-              showNotification(
-                `Error saving apprentice: ${errorData.detail}`,
-                false
-              );
+            if (!window.confirm("Are you sure you want to save these changes?")) {
+                return;
             }
-          } catch (error) {
-            showNotification(
-              "An error occurred while saving the apprentice",
-              false
-            );
-            console.error("Error:", error);
-          }
 
-          currentApprenticeId = null;
+            
+            const apprenticeData = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                age: document.getElementById("age").value,
+                cohort_year: document.getElementById("cohort_year").value,
+                job_role: document.getElementById("job_role").value,
+                skills: document.getElementById("skills").value,
+            };
+
+            try {
+                let response;
+                if (currentApprenticeId) {
+                    response = await fetch(`/apprentices/${currentApprenticeId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(apprenticeData),
+                    });
+                } else {
+                    response = await fetch("/apprentices", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(apprenticeData),
+                    });
+                }
+
+                if (response.ok) {
+                    showNotification("Apprentice saved successfully", true);
+                    location.reload();
+                } else {
+                    const errorData = await response.json();
+                    showNotification(`Error saving apprentice: ${errorData.detail}`, false);
+                }
+            } catch (error) {
+                showNotification("An error occurred while saving the apprentice", false);
+                console.error("Error:", error);
+            }
+
+            currentApprenticeId = null;
         });
 
-      function editApprentice(apprenticeId) {
+    function validateForm() {
+        const name = document.getElementById("name").value.trim();
+        const age = parseInt(document.getElementById("age").value, 10);
+        const cohortYear = parseInt(document.getElementById("cohort_year").value, 10);
+        const jobRole = document.getElementById("job_role").value.trim();
+        const skills = document.getElementById("skills").value.trim();
+
+        let isValid = true;
+
+        
+        const nameRegex = /^[A-Za-z\s]+$/;
+        if (!nameRegex.test(name)) {
+            setError("name", "Name must contain only alphabetic characters and spaces.");
+            isValid = false;
+        } else {
+            clearError("name");
+        }
+
+        // Validate age
+        if (age < 1 || age > 100) {
+            setError("age", "Age must be between 1 and 100");
+            isValid = false;
+        } else {
+            clearError("age");
+        }
+
+        
+        const currentYear = new Date().getFullYear();
+        if (cohortYear > currentYear) {
+            setError("cohort_year", "Cohort year cannot be greater than current year");
+            isValid = false;
+        } else {
+            clearError("cohort_year");
+        }
+
+        
+        const jobRoleRegex = /^[A-Za-z\s]+$/;
+        if (!jobRoleRegex.test(jobRole)) {
+            setError("job_role", "Job role must contain only alphabetic characters and spaces");
+            isValid = false;
+        } else {
+            clearError("job_role");
+        }
+
+        
+        const skillsRegex = /^[A-Za-z\s,]*$/;
+        if (!skillsRegex.test(skills)) {
+            setError("skills", "Skills must contain only alphabetic characters, spaces, and commas");
+            isValid = false;
+        } else {
+            clearError("skills");
+        }
+
+        return isValid;
+    }
+
+    function setError(inputId, message) {
+        const input = document.getElementById(inputId);
+        input.classList.add("is-invalid");
+        input.setAttribute("data-bs-original-title", message);
+        const tooltip = bootstrap.Tooltip.getInstance(input);
+        tooltip.show();
+    }
+
+    function clearError(inputId) {
+        const input = document.getElementById(inputId);
+        input.classList.remove("is-invalid");
+        input.removeAttribute("data-bs-original-title");
+        const tooltip = bootstrap.Tooltip.getInstance(input);
+        if (tooltip) tooltip.hide();
+    }
+
+    function editApprentice(apprenticeId) {
         fetch(`/apprentices/${apprenticeId}`)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to fetch apprentice");
-            }
-            return response.json();
-          })
-          .then((apprentice) => {
-            document.getElementById("name").value = apprentice.name;
-            document.getElementById("email").value = apprentice.email;
-            document.getElementById("age").value = apprentice.age;
-            document.getElementById("cohort_year").value =
-              apprentice.cohort_year;
-            document.getElementById("job_role").value = apprentice.job_role;
-            document.getElementById("skills").value = apprentice.skills;
+            .then((response) => response.json())
+            .then((apprentice) => {
+                document.getElementById("name").value = apprentice.name;
+                document.getElementById("email").value = apprentice.email;
+                document.getElementById("age").value = apprentice.age;
+                document.getElementById("cohort_year").value = apprentice.cohort_year;
+                document.getElementById("job_role").value = apprentice.job_role;
+                document.getElementById("skills").value = apprentice.skills;
 
-            currentApprenticeId = apprenticeId;
+                currentApprenticeId = apprenticeId;
 
-            document.getElementById("exampleModalLabel").innerText =
-              "Update Apprentice";
+                document.getElementById("exampleModalLabel").innerText = "Update Apprentice";
 
-            const modal = new bootstrap.Modal(
-              document.getElementById("addApprenticeModal")
-            );
-            modal.show();
-          })
-          .catch((error) => {
-            showNotification("Failed to fetch apprentice details", false);
-            console.error("Error fetching apprentice data:", error);
-          });
-      }
+                const modal = new bootstrap.Modal(
+                    document.getElementById("addApprenticeModal")
+                );
+                modal.show();
+            })
+            .catch((error) => {
+                showNotification("Failed to fetch apprentice details", false);
+                console.error("Error fetching apprentice data:", error);
+            });
+    }
 
-      document
+    document
         .querySelector("[data-bs-target='#addApprenticeModal']")
         .addEventListener("click", function () {
-          // Clear form fields
-          document.getElementById("name").value = "";
-          document.getElementById("email").value = "";
-          document.getElementById("age").value = "";
-          document.getElementById("cohort_year").value = "";
-          document.getElementById("job_role").value = "";
-          document.getElementById("skills").value = "";
+            
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("age").value = "";
+            document.getElementById("cohort_year").value = "";
+            document.getElementById("job_role").value = "";
+            document.getElementById("skills").value = "";
 
-          document.getElementById("exampleModalLabel").innerText =
-            "Add Apprentice";
+            document.getElementById("exampleModalLabel").innerText = "Add Apprentice";
 
-          currentApprenticeId = null; 
+            currentApprenticeId = null;
         });
 
-      function confirmDelete(apprenticeId) {
-        if (
-          window.confirm("Are you sure you want to delete this apprentice?")
-        ) {
-          deleteApprentice(apprenticeId);
+    function confirmDelete(apprenticeId) {
+        if (window.confirm("Are you sure you want to delete this apprentice?")) {
+            deleteApprentice(apprenticeId);
         }
-      }
+    }
 
-      function deleteApprentice(apprenticeId) {
+    function deleteApprentice(apprenticeId) {
         fetch(`/apprentices/${apprenticeId}`, {
-          method: "DELETE",
+            method: "DELETE",
         })
-          .then((response) => {
-            if (response.ok) {
-              showNotification("Apprentice deleted successfully", true);
-              location.reload();
-            } else {
-              showNotification("Error deleting apprentice", false);
-            }
-          })
-          .catch((error) => {
-            showNotification(
-              "An error occurred while deleting the apprentice",
-              false
-            );
-            console.error("Error:", error);
-          });
-      }
-    </script>
-  </body>
+            .then((response) => {
+                if (response.ok) {
+                    showNotification("Apprentice deleted successfully", true);
+                    location.reload();
+                } else {
+                    showNotification("Error deleting apprentice", false);
+                }
+            })
+            .catch((error) => {
+                showNotification("An error occurred while deleting the apprentice", false);
+                console.error("Error:", error);
+            });
+    }
+</script>
+</body>
 </html>
